@@ -1,3 +1,7 @@
+import networkx as nx
+
+from  base_algorithm import AbstractSimAlgorithm
+
 class BasicRelations(AbstractSimAlgorithm):
     def __init__(self, rels, out_stats, out_graph):
         self.rels = rels
@@ -6,6 +10,7 @@ class BasicRelations(AbstractSimAlgorithm):
 
     def process(self, data):
         self.graphs = {}
+        l = []
         for rec in data.keys():
             l.append(rec)
             for r in self.rels:
@@ -18,10 +23,10 @@ class BasicRelations(AbstractSimAlgorithm):
                                 self.graphs[r] = nx.Graph()
                         l.append(p)
                         self.graphs[r].add_edge(rec, p, attr_dict={'weight': data[rec][r][p]})
-        
+
         return {
-                "stats": get_stats(data),
-                "graphs": get_graphs(data)
+                "stats": self.get_stats(data),
+                "graphs": self.get_graphs(data)
                }
     def get_stats(self, data):
         stats = {}
@@ -45,7 +50,7 @@ class BasicRelations(AbstractSimAlgorithm):
                         c = []
                         for f in self.out_stats[r]["fields"]:
                             if b in data and f in data[b]:
-                                c.append(a[b][f])
+                                c.append(data[b][f])
                         if c in stats[r][f].keys():
                             stats[r][f]["-".join(c)] += count
                         else:
@@ -57,12 +62,12 @@ class BasicRelations(AbstractSimAlgorithm):
         for r in self.rels.keys():
             if r not in graphs_fields:
                 graphs_fields[r] = {}
-                
+
             for edge in self.graphs[r].edges(data=True):
                 i = edge[0]
                 j = edge[1]
 
-                for f in out_graphs[r]:
+                for f in self.out_graph[r]:
                     elems_i = []
                     elems_j = []
                     if f not in graphs_fields[r]:
@@ -83,4 +88,5 @@ class BasicRelations(AbstractSimAlgorithm):
                                     graphs_fields[r][f].add_edge(ci, cj, attr_dict=edge[2])
                             else:
                                 graphs_fields[r][f].add_edge(ci, cj, attr_dict=edge[2]) 
-        return graphs_fields.update(self.graphs)
+        graphs_fields.update(self.graphs)
+        return graphs_fields
