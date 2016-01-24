@@ -1,5 +1,6 @@
 import json
-from app import db
+from src import system
+from webserver import db
 
 '''
    data struncture:
@@ -20,7 +21,7 @@ from app import db
 
 class SystemDao(db.Model):
 
-    __tablename__ = 'system'
+    __tablename__ = 'systemdao'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)
     description = db.Column(db.String(1024), unique=True)
@@ -30,22 +31,19 @@ class SystemDao(db.Model):
         self.name = name
         self.data = json.dumps(data)
 
-    def get_components(self):
+    def get_system(self):
         data = json.loads(self.data)
-        ret = []
-        for i in data:
-            ret.append(self, self._get_subcomponents(i))
+        return self._get_system(data)
 
-    def _get_subcomponents(self, data):
-        ret = []
-        for i in data:
-            s = System(
-                    data['name'],
-                    data['type'],
-                    data['limit'],
-                    self._get_subcomponents(data['components'])
-                )
-            ret.append(s)
-        return ret
+    def _get_system(self, data):
+        next_system = None
+        components = []
+        for i in data['components']:
+            components.append(self._get_system(i))
+        if data['next_s']:
+            next_system = self._get_system(data['next_s'])
+
+        return system.System(data['name'], data['s_type'], data['limit'],
+            data['weight'], data['input_type'], data['output_type'], components, next_system)
 
 

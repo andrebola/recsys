@@ -1,7 +1,7 @@
 from algs_handler import get_recommend_algs
 
 
-class System():
+class System(object):
     def __init__(self, name, s_type, limit, weight, input_type, output_type,
             components=None, next_sys=None):
         self.name = name
@@ -15,6 +15,14 @@ class System():
 
     def __repr__(self):
         return '<System %r>' % (self.name)
+
+    def get_graphs(self):
+        '''If type of System is alg, call get_graphs of the algorithm.
+
+        '''
+        algs, errors = get_recommend_algs()
+        if self.name in algs and self.s_type == 'alg':
+            return algs[self.name].get_graphs()
 
     def recommend(self, objids):
         '''Given a system and a ids of recordings or artist,

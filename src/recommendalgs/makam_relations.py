@@ -2,6 +2,7 @@ import os
 import json
 import networkx as nx
 
+from networkx.readwrite import json_graph
 from src.similarityalgs.basic_relations import BasicRelations
 from base_algorithm import AbstractRecommendAlgorithm
 from recommend_mixins import Artist2ArtistMixin
@@ -39,3 +40,7 @@ class MakamRecommend(AbstractRecommendAlgorithm, Artist2ArtistMixin):
     def get_out_location(self):
         curr_dir = os.path.dirname(os.path.abspath(__file__))
         return os.path.join(curr_dir, "out/makam.graphml")
+
+    def get_graphs(self):
+        d = json_graph.node_link_data(self.graph)
+        return d

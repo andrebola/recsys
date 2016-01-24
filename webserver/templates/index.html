@@ -1,0 +1,45 @@
+{%- extends 'base.html' -%}
+
+{%- block title -%}Test{%- endblock -%}
+  
+{%- block extra_head -%}
+{%- endblock -%}
+  
+{%- block content -%}
+  <h2 class="page-title">Test System</h2>
+  <div>
+  <textarea id="dats">
+  </textarea>
+  <input name='mbid' type='text'id='mbid'/>
+  <input type='submit' id='try' name='Try'/>
+  <a href="/stats">View Graph</a>
+  </div>
+  <div id='result'></div>
+{%- endblock -%}
+
+{%- block scripts -%}
+  {{ super() }}
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script>
+  $('#try').click(function(){
+    var dat = {mbid: $('#mbid').val(), data: JSON.parse($('#dats').val())};
+    console.log(dat);
+    $.ajax({
+       url: "/api/try-system/",
+       type: "POST",
+       data: JSON.stringify(dat),
+       contentType: "application/json",
+       //force to handle it as text
+       dataType: "json",
+            success: function (dataTest) {
+
+                dataTest.forEach(function(e){
+                $('#result').append('<div>' + e + '</div>');
+                });
+
+      }
+    });
+    return false;
+  });
+  </script>
+{%- endblock -%}
