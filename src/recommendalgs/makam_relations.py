@@ -18,14 +18,18 @@ class MakamRecommend(AbstractRecommendAlgorithm, Artist2ArtistMixin):
         out_stats = {"perfComposition": {"type": "popularity", "fields": ["country", "born"]}}
 
         data_location = self.get_out_location()
+        data_location_country = self.get_out_location_country()
         if not os.path.isfile(data_location):
             rels = BasicRelations(rels, out_stats, out_graphs)
             data = json.load(open('/tmp/rels.json'))
             out = rels.process(data)
-            self.graph = out['graphs']['perfComposition']
+            self.graph = out['graphs']['perfComposition']['perfComposition']
+            self.graph_country = out['graphs']['perfComposition']['country']
             nx.write_graphml(self.graph, data_location, encoding='utf-8')
+            nx.write_graphml(self.graph_country, data_location_country, encoding='utf-8')
         else:
             self.graph = nx.read_graphml(data_location)
+            self.graph_country = nx.read_graphml(data_location_country)
 
     def recommend_a2a(self, artists_ids=None):
         ret = []
@@ -41,6 +45,11 @@ class MakamRecommend(AbstractRecommendAlgorithm, Artist2ArtistMixin):
         curr_dir = os.path.dirname(os.path.abspath(__file__))
         return os.path.join(curr_dir, "out/makam.graphml")
 
+    def get_out_location_country(self):
+        curr_dir = os.path.dirname(os.path.abspath(__file__))
+        return os.path.join(curr_dir, "out/makam_country.graphml")
+
+
     def get_graphs(self):
-        d = json_graph.node_link_data(self.graph)
+        d = json_graph.node_link_data(self.graph_country)
         return d

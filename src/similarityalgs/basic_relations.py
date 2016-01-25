@@ -88,5 +88,9 @@ class BasicRelations(AbstractSimAlgorithm):
                                     graphs_fields[r][f].add_edge(ci, cj, attr_dict=edge[2])
                             else:
                                 graphs_fields[r][f].add_edge(ci, cj, attr_dict=edge[2]) 
-        graphs_fields.update(self.graphs)
+
+        for k in self.graphs.keys():
+            if k not in graphs_fields:
+                graphs_fields[k] = {}
+            graphs_fields[k][k] = self.graphs[k]
         return graphs_fields
